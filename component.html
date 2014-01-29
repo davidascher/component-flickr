@@ -1,0 +1,115 @@
+<polymer-element name="ceci-flickr" attributes="tag searchterm location" extends="ceci-element"
+  tag="house" searchterm="house">
+  <template>
+    <link rel="stylesheet" href="component.css"></link>
+    <img id="flickr" class="image" on-click="{{sendImage}}"></button>
+    <div id="loading" class="loading"></div>
+    <shadow></shadow>
+    <script type="text/json" id="ceci-definition">
+      {
+        "name": "flickr",
+        "tags": ["flickr", "click", "tap"],
+        "thumbnail": "./thumbnail.png",
+        "broadcasts": {
+          "sendImage": {
+            "label": "send image url",
+            "description": "Occurs when the image is clicked",
+            "default": true
+          }
+        },
+        "listeners": {
+          "newImage": {
+            "description": "Searches for a new image",
+            "label": "Fetch New Image"
+          }
+        },
+        "attributes": {
+          "tag": {
+            "label": "Tag",
+            "description": "Tag used to search images.",
+            "editable": "text",
+            "listener": true
+          },
+          "searchterm": {
+            "label": "Search term",
+            "description": "Term used to search for images",
+            "editable": "text",
+            "listener": true
+          }
+        }
+      }
+    </script>
+  </template>
+  <script>
+    Polymer('ceci-flickr', {
+      ready: function () {
+        this.super();
+        this.lat = 0;
+        this.lng = 0;
+
+        var that = this;
+        this.$.flickr.addEventListener('mousedown', function (e) {
+          window.addEventListener('mouseup', function (e) {
+            that.sendImage();
+          }, false);
+        }, false);
+        this.newImage();
+      },
+      sendImage: function () {
+        this.broadcast('sendImage', this.$.flickr.getAttribute('src'));
+      },
+      tagChanged: function (oldValue, newValue) {
+        this.newImage();
+      },
+      searchtermChanged: function (oldValue, newValue) {
+        this.newImage();
+      },
+      getJSON: function(url, successHandler, errorHandler) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('get', url, true);
+        xhr.onreadystatechange = function() {
+          var status;
+          var data;
+          if (xhr.readyState == 4) { // `DONE`
+            status = xhr.status;
+            if (status == 200) {
+              data = JSON.parse(xhr.responseText);
+              if (successHandler) {
+                successHandler(data);
+              }
+            } else {
+              if (errorHandler) {
+               errorHandler(status);
+              }
+            }
+          }
+        };
+        xhr.send();
+      },
+      newImage: function() {
+        var img = this.$.flickr;
+        var API_KEY = "4b3f331df9427810328ad803b5b0cb9a";
+        var url = encodeURI("http://api.flickr.com/services/rest/?method=flickr.photos.search&api_key="+API_KEY+"&text=" + this.searchterm + "&safe_search=1&per_page=40");
+        if (this.lat && this.lng) {
+          url = url + "&lat="+this.lat + "&lon=" + this.lng;
+        } else {
+          url = url + "&sort=relevance"; // if not location based, let's make them relevant
+        }
+        var src;
+        console.log("Searching for new image with term", this.searchterm);
+        var element = this;
+        this.getJSON(url + "&format=json&nojsoncallback=?", function(data) {
+          var count = data.photos.photo.length;
+          if (!count) return; // no photos found
+          var randomIndex = Math.floor(Math.random()*count);
+          var item = data.photos.photo[randomIndex];
+          var src = "http://farm"+ item.farm +".static.flickr.com/"+ item.server +"/"+ item.id +"_"+ item.secret +"_m.jpg";
+          img.setAttribute("src", src);
+          // straight emit, will only broadcast if a channel has been chosen
+          element.sendImage();
+          element.$.loading.style.display = "none";
+        });
+      }
+    });
+  </script>
+</polymer-element>

@@ -1,0 +1,14 @@
+{
+	"ceci-flickr": "flickr",
+	"ceci-flickr/attributes/label": "Click Me",
+	"ceci-flickr/attributes/label/label": "Label",
+	"ceci-flickr/attributes/label/description": "Text shown on the button.",
+	"ceci-flickr/attributes/value/label": "Value",
+	"ceci-flickr/attributes/value/description": "Value sent by the button.",
+	"ceci-flickr/attributes/textcolor/label": "Text Color",
+	"ceci-flickr/attributes/textcolor/description": "Color of the text on the button's label.",
+	"ceci-flickr/attributes/buttoncolor/label": "flickr Color",
+	"ceci-flickr/attributes/buttoncolor/description": "Background color of the button.",
+	"ceci-flickr/attributes/buttonactivecolor/label": "Button Active Color",
+	"ceci-flickr/attributes/buttonactivecolor/description": "Background color of the button while it is being clicked or tapped."
+}
