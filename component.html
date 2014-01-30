@@ -86,7 +86,7 @@
 
         var that = this;
         this.$.flickr.addEventListener('mousedown', function () {
-          window.addEventListener('mouseup', function () {
+          that.$.flickr.addEventListener('mouseup', function () {
             that.sendImage();
           }, false);
         }, false);
